@@ -13,18 +13,22 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.example.scopedstorage.databinding.ActivityMainBinding
+
 //import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     private val OPEN_GALLERY = 1
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        val go_intent = findViewById(R.id.loadImageBtn) as Button
-        go_intent.setOnClickListener{ openGallery() }
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+//        val go_intent = findViewById(R.id.loadImageBtn) as Button
+        binding.loadImageBtn.setOnClickListener{ openGallery() }
     }
 
     private fun openGallery(){
@@ -37,14 +41,12 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        val imageView = findViewById(R.id.imageView) as ImageView
+//        val imageView = findViewById(R.id.imageView) as ImageView
         if(requestCode == OPEN_GALLERY){
             if(resultCode == RESULT_OK){
                 var dataUri = data?.data
                 try{
-                    var bitmap : Bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver,dataUri)
-
-                    imageView.setImageBitmap(bitmap)
+                   Glide.with(this).load(dataUri).into(binding.imageView)
                 }catch (e:Exception){
                     Toast.makeText(this,"$e",Toast.LENGTH_SHORT).show()
                 }
@@ -102,9 +104,6 @@ class MainActivity : AppCompatActivity() {
 //            .into(imageView)
 //    }
 //
-////            val contentUri = Uri.withAppendedPath(
-////                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-////                id.toString()
-////            )
+
 //
 //}
