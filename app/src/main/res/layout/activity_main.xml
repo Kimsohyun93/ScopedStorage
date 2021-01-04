@@ -11,18 +11,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/ic_baseline_image_24"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/loadImageBtn"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/takePhotoBtn"
+/>
 
     <Button
         android:id="@+id/loadImageBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Click to load Image"
+        app:layout_constraintTop_toBottomOf="@+id/takePhotoBtn"
         app:layout_constraintBottom_toBottomOf="parent"/>
+    <Button
+        android:id="@+id/takePhotoBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Click to Take Photo"
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintBottom_toBottomOf="@+id/loadImageBtn"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

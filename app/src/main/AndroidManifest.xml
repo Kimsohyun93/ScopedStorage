@@ -3,6 +3,9 @@
     package="com.example.scopedstorage">
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera2.full"/>
+
 
     <!-- Temporarily opt-out when targeting sdk 30 -->
     <uses-sdk android:targetSdkVersion="30" />
