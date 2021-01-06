@@ -2,7 +2,6 @@ package com.example.scopedstorage
 
 import android.Manifest
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -19,9 +18,8 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import com.example.scopedstorage.RotatePicture.handleSamplingAndRotationBitmap
 
-
-//import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,12 +29,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-//        val go_intent = findViewById(R.id.loadImageBtn) as Button
+
         binding.loadImageBtn.setOnClickListener { openGallery() }
         binding.takePhotoBtn.setOnClickListener { openCamera() }
+
         TedPermission.with(this)
             .setPermissionListener(permissionlistener)
             .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
@@ -65,6 +65,8 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(intent, OPEN_GALLERY)
     }
 
+    private var mCameraPhotoPath: Uri? = null
+
     private fun openCamera() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             takePictureIntent.resolveActivity(packageManager)?.also {
@@ -75,24 +77,20 @@ class MainActivity : AppCompatActivity() {
                     null
                 }
                 photoFile?.also {
-                    val photoUri: Uri = FileProvider.getUriForFile(
+                    mCameraPhotoPath = FileProvider.getUriForFile(
                         this,
                         "com.example.android.fileprovider",
                         it
                     )
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCameraPhotoPath)
                     startActivityForResult(takePictureIntent, OPEN_CAMERA)
                 }
-                //   startActivityForResult(takePictureIntent, OPEN_CAMERA)
             }
         }
-        /*
-    if(intent.resolveActivity(getPackageManager()) != null) {
-        startActivityForResult(intent, OPEN_CAMERA)
+
+
     }
 
-     */
-    }
 
     lateinit var currentPhotoPath: String
 
@@ -113,7 +111,6 @@ class MainActivity : AppCompatActivity() {
     @Override
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-//        val imageView = findViewById(R.id.imageView) as ImageView
 
         if (requestCode == OPEN_GALLERY) {
             if (resultCode == RESULT_OK) {
@@ -128,80 +125,21 @@ class MainActivity : AppCompatActivity() {
         } else if (requestCode == OPEN_CAMERA) {
             if (resultCode == RESULT_OK) {
                 try {
-                    val bmOptions = BitmapFactory.Options()
-                    BitmapFactory.decodeFile(currentPhotoPath, bmOptions)?.also { bitmap ->
-                        binding.imageView.setImageBitmap(bitmap)}
+                    Log.d("Data Uri : ", "${data?.data}")
+                    binding.imageView.setImageBitmap(
+                        handleSamplingAndRotationBitmap(
+                            this,
+                            mCameraPhotoPath
+                        )
+                    )
 
-                        //load thumbnail
-                        //val imageBitmap = data?.extras?.get("data") as Bitmap
-                        //binding.imageView.setImageBitmap(imageBitmap)
-                        /* fail load image to glide
-                        var dataUri: Uri? = data?.data
-                        Log.e("##### Data Uri:  ", "$dataUri")
-                        Glide.with(this).load(dataUri).into(binding.imageView)
 
-                        //binding.imageView.setImageURI(dataUri)
-                         */
-
-                    } catch (e: Exception) {
-                        Toast.makeText(this, "$e", Toast.LENGTH_SHORT).show()
-                        Log.e("Error", "${e.message}")
-                    }
+                } catch (e: Exception) {
+                    Toast.makeText(this, "$e", Toast.LENGTH_SHORT).show()
+                    Log.e("Error", "${e.message}")
                 }
-            } else {
             }
+        } else {
         }
-
     }
-
-
-//
-//
-//data class Image(
-//    val uri: Uri,
-//    val name: String,
-//    val date: Date
-//)
-//
-//val imageList = mutableListOf<Image>()
-//val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-//
-//val projection = arrayOf(
-//    MediaStore.Images.Media._ID,
-//    MediaStore.Images.Media.DISPLAY_NAME,
-//    MediaStore.Images.Media.DATE_TAKEN
-//)
-//
-////        val selection = MediaStore.Images.Media.MIME_TYPE + "=?"
-////        val selectionArgs = arrayOf(MimeTypeMap.getSingleton().getMimeTypeFromExtension("txt"))
-//
-//val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC"
-//
-//val query = contentResolver.query(uri, projection, null, null, sortOrder)
-//
-//query?.use { cursor ->
-//    val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-//    val dateTakenColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN)
-//    val displayNameColumn =
-//        cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
-//    while (cursor.moveToNext()) {
-//        val id = cursor.getLong(idColumn)
-//        val dateTaken = Date(cursor.getLong(dateTakenColumn))
-//        val displayName = cursor.getString(displayNameColumn)
-//        val contentUri = Uri.withAppendedPath(
-//            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-//            id.toString()
-//        )
-//        Log.d(
-//            "Test",
-//            "id : $id, display_name : $displayName, data_taken : $dateTaken, content_uri : $contentUri\n"
-//        )
-//        imageList += Image(contentUri, displayName, dateTaken)
-//        Glide.with(this@MainActivity)
-//            .load(contentUri)
-//            .into(imageView)
-//    }
-//
-
-//
-//}
+}
